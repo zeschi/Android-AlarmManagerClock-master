@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_common_dialog_layout"
+    android:layout_width="250dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_item_alarm"
+    android:orientation="vertical">
+
+    <!--提示信息-->
+    <TextView
+        android:id="@+id/tv_common_dialog_hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="20dp"
+        android:textColor="#969696"
+        android:textSize="15sp" />
+
+    <!--底部按钮-->
+    <LinearLayout
+        android:id="@+id/ll_common_dialog_double"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_common_dialog_double_left"
+            android:layout_width="0dp"
+            android:layout_height="35dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_dialog_btn"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/btn_common_dialog_double_right"
+            android:layout_width="0dp"
+            android:layout_height="35dp"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_dialog_btn"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+    </LinearLayout>
+</LinearLayout>

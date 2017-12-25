@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">AlarmManagerClock</string>
+    <string name="mon">Monday</string>
+    <string name="tue">Tuesday</string>
+    <string name="wed">Wednesday</string>
+    <string name="thu">Thursday</string>
+    <string name="fri">Friday</string>
+    <string name="sat">Saturday</string>
+    <string name="sun">Sunday</string>
+    <string name="cycle_sure">确定</string>
+    <string name="vibration">震动</string>
+    <string name="ring">铃声</string>
+</resources>

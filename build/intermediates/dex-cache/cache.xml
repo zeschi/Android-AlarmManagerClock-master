@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="D:\project\Android-AlarmManagerClock-master\app\build\intermediates\exploded-aar\Android-AlarmManagerClock-master\alarmmanagerclock\unspecified\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.3"
+        sha1="0cb360a0307cc4f15f851d41248251f2f1fb39c9">
+        <dex dex="D:\project\Android-AlarmManagerClock-master\app\build\intermediates\pre-dexed\debug\Android-AlarmManagerClock-master-alarmmanagerclock-unspecified_3218bd4f9693e0eb4fc08ac775df4ecdbbddc990.jar" />
+    </item>
+
+</items>
