@@ -5,6 +5,7 @@ import android.app.Service;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.view.View;
@@ -42,10 +43,10 @@ public class ClockAlarmActivity extends Activity {
     private void showDialogInBroadcastReceiver() {
 //        if (flag == 1 || flag == 2) {
         //
-
-//        mediaPlayer = MediaPlayer.create(this, R.raw.in_call_alarm);
-//        mediaPlayer.setLooping(true);
-//        mediaPlayer.start();
+        Uri uri = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_ALARM);
+        mediaPlayer = MediaPlayer.create(this, uri);
+        mediaPlayer.setLooping(true);
+        mediaPlayer.start();
 ////        }
 //        //数组参数意义：第一个参数为等待指定时间后开始震动，震动时间为第二个参数。后边的参数依次为等待震动和震动的时间
 //        //第二个参数为重复次数，-1为不重复，0为一直震动
@@ -82,13 +83,13 @@ public class ClockAlarmActivity extends Activity {
             public void onClick(View v) {
                 if (dialog.bt_confirm == v) {
 //                    if (flag == 1 || flag == 2) {
-//                    mediaPlayer.stop();
-//                    mediaPlayer.release();
+                    AlarmManagerUtil.cancelAlarm(ClockAlarmActivity.this, LoongggAlarmReceiver.GRAY_WAKE_ACTION, id);
+                    mediaPlayer.stop();
+                    mediaPlayer.release();
 //                    }
 //                    if (flag == 0 || flag == 2) {
                     vibrator.cancel();
 //                    }
-                    AlarmManagerUtil.cancelAlarm(ClockAlarmActivity.this, LoongggAlarmReceiver.GRAY_WAKE_ACTION, id);
                     dialog.dismiss();
                     finish();
                 }
@@ -99,8 +100,6 @@ public class ClockAlarmActivity extends Activity {
             public void onClick(View v) {
                 if (dialog.bt_later == v) {
 //                    if (flag == 1 || flag == 2) {
-//                    mediaPlayer.stop();
-//                    mediaPlayer.release();
 //                    }
 //                    if (flag == 0 || flag == 2) {
                     List<Alarm> alarms = MyApp.instances.getDaoSession().getAlarmDao().queryBuilder().where(AlarmDao.Properties.Id.eq(id)).list();
@@ -112,6 +111,8 @@ public class ClockAlarmActivity extends Activity {
                             MyApp.instances.getDaoSession().getAlarmDao().update(alarms.get(0));
                         }
                     }
+                    mediaPlayer.stop();
+                    mediaPlayer.release();
                     vibrator.cancel();
                     dialog.dismiss();
                     finish();
@@ -134,8 +135,8 @@ public class ClockAlarmActivity extends Activity {
             public void onClick(View v) {
                 if (dialog.bt_confirm == v) {
 //                    if (flag == 1 || flag == 2) {
-//                    mediaPlayer.stop();
-//                    mediaPlayer.release();
+                    mediaPlayer.stop();
+                    mediaPlayer.release();
 //                    }
 //                    if (flag == 0 || flag == 2) {
                     vibrator.cancel();
@@ -169,8 +170,6 @@ public class ClockAlarmActivity extends Activity {
             public void onClick(View v) {
                 if (dialog.bt_confirm == v || dialog.bt_cancel == v) {
 //                    if (flag == 1 || flag == 2) {
-//                    mediaPlayer.stop();
-//                    mediaPlayer.release();
 //                    }
 //                    if (flag == 0 || flag == 2) {
                     if (dialog.getCalculateResult() != calculateResult) {
@@ -178,6 +177,8 @@ public class ClockAlarmActivity extends Activity {
                         return;
                     }
 //                    }
+                    mediaPlayer.stop();
+                    mediaPlayer.release();
                     vibrator.cancel();
                     dialog.dismiss();
                     finish();

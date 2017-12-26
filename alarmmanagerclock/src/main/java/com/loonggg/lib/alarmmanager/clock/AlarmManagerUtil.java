@@ -64,7 +64,7 @@ public class AlarmManagerUtil {
                 break;
         }
         calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get
-                (Calendar.DAY_OF_MONTH), hour, minute, 0);
+                (Calendar.DAY_OF_MONTH), hour, minute, 5);
         intent.putExtra("timeInMillis", calMethod(week, calendar.getTimeInMillis()));
 
         PendingIntent sender = PendingIntent.getBroadcast(context, id, intent, PendingIntent
