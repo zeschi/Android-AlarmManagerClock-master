@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.widget.Toast;
 
 
 import java.util.Calendar;
@@ -27,7 +26,7 @@ public class AlarmManagerUtil {
     }
 
     public static void cancelAlarm(Context context, String action, int id) {
-        Intent intent = new Intent(action);
+        Intent intent = new Intent(ALARM_ACTION);
         PendingIntent pi = PendingIntent.getBroadcast(context, id, intent, PendingIntent
                 .FLAG_CANCEL_CURRENT);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -48,24 +47,13 @@ public class AlarmManagerUtil {
             week, String tips, int ring) {
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
-        long intervalMillis = 0;
-
-        if (flag == 0) {
-            intervalMillis = 0;
-        } else if (flag == 1) {
-            intervalMillis = 24 * 3600 * 1000;
-        } else if (flag == 2) {
-            intervalMillis = 24 * 3600 * 1000 * 7;
-        }
         Intent intent = new Intent(ALARM_ACTION);
-        intent.putExtra("intervalMillis", intervalMillis);
         intent.putExtra("ringType", ring);
         intent.putExtra("id", id);
 //        intent.putExtra("soundOrVibrator", ring);
         switch (ring) {
             case 0:
                 intent.putExtra("msg", "Normal to wake up");
-
                 break;
             case 1:
                 intent.putExtra("msg", "Easy to wake up");
@@ -76,7 +64,9 @@ public class AlarmManagerUtil {
                 break;
         }
         calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get
-                (Calendar.DAY_OF_MONTH), hour, minute, 10);
+                (Calendar.DAY_OF_MONTH), hour, minute, 0);
+        intent.putExtra("timeInMillis", calMethod(week, calendar.getTimeInMillis()));
+
         PendingIntent sender = PendingIntent.getBroadcast(context, id, intent, PendingIntent
                 .FLAG_CANCEL_CURRENT);
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -90,11 +80,20 @@ public class AlarmManagerUtil {
 //                        ()), intervalMillis, sender);
 //            }
 //        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             //API19以上使用
-            am.setExact(AlarmManager.RTC_WAKEUP, calMethod(week, calendar.getTimeInMillis()), sender);
+            if (flag == 0) {
+                am.setInexactRepeating(AlarmManager.RTC_WAKEUP, calMethod(week, calendar.getTimeInMillis()), AlarmManager.INTERVAL_DAY, sender);
+            } else {
+                am.setExact(AlarmManager.RTC_WAKEUP, calMethod(week, calendar.getTimeInMillis()), sender);
+            }
         } else {
-            am.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), sender);
+            if (flag == 0) {
+                am.setRepeating(AlarmManager.RTC_WAKEUP, calMethod(week, calendar.getTimeInMillis()), AlarmManager.INTERVAL_DAY, sender);
+            } else {
+                am.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), sender);
+            }
         }
     }
 
@@ -104,7 +103,7 @@ public class AlarmManagerUtil {
      * @param dateTime 传入的是时间戳（设置当天的年月日+从选择框拿来的时分秒）
      * @return 返回起始闹钟时间的时间戳
      */
-    private static long calMethod(int weekflag, long dateTime) {
+    public static long calMethod(int weekflag, long dateTime) {
         long time = 0;
         //weekflag == 0表示是按天为周期性的时间间隔或者是一次行的，weekfalg非0时表示每周几的闹钟并以周为时间间隔
         if (weekflag != 0) {
@@ -147,5 +146,34 @@ public class AlarmManagerUtil {
         return time;
     }
 
+    /**
+     * 设置推迟闹钟的时间
+     *
+     * @param context
+     * @param timeInMillis
+     * @param id
+     * @param intervalMillis
+     */
+    public static void setAlarmLaterInMinute(Context context, long timeInMillis, int id, int intervalMillis) {
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(ALARM_ACTION);
+        PendingIntent sender = PendingIntent.getBroadcast(context, id, intent, PendingIntent
+                .FLAG_CANCEL_CURRENT);
+        am.setInexactRepeating(AlarmManager.RTC_WAKEUP, timeInMillis,
+                intervalMillis, sender);
+    }
+
+    public static void setAlarm(Context context, long timeInMillis, int id) {
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(ALARM_ACTION);
+        PendingIntent sender = PendingIntent.getBroadcast(context, id, intent, PendingIntent
+                .FLAG_CANCEL_CURRENT);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            //API19以上使用
+            am.setExact(AlarmManager.RTC_WAKEUP, timeInMillis, sender);
+        } else {
+            am.set(AlarmManager.RTC_WAKEUP, timeInMillis, sender);
+        }
+    }
 
 }

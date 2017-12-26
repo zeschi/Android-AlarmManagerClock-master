@@ -10,6 +10,12 @@ import android.os.Vibrator;
 import android.view.View;
 import android.widget.Toast;
 
+import com.MyApp;
+import com.loonggg.lib.alarmmanager.clock.bean.Alarm;
+import com.zes.greendao.gen.AlarmDao;
+
+import java.util.List;
+
 
 public class ClockAlarmActivity extends Activity {
     private MediaPlayer mediaPlayer;
@@ -18,6 +24,8 @@ public class ClockAlarmActivity extends Activity {
     private int calculateResult;
     private int ringType;
     private String message = "";
+    private int id;
+    private long timeInMillis;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +34,8 @@ public class ClockAlarmActivity extends Activity {
         int flag = this.getIntent().getIntExtra("flag", 0);
         ringType = this.getIntent().getIntExtra("ringType", 0);
         message = getIntent().getStringExtra("msg");
+        id = getIntent().getIntExtra("id", 0);
+        timeInMillis = getIntent().getLongExtra("timeInMillis", 0);
         showDialogInBroadcastReceiver();
     }
 
@@ -33,9 +43,9 @@ public class ClockAlarmActivity extends Activity {
 //        if (flag == 1 || flag == 2) {
         //
 
-        mediaPlayer = MediaPlayer.create(this, R.raw.in_call_alarm);
-        mediaPlayer.setLooping(true);
-        mediaPlayer.start();
+//        mediaPlayer = MediaPlayer.create(this, R.raw.in_call_alarm);
+//        mediaPlayer.setLooping(true);
+//        mediaPlayer.start();
 ////        }
 //        //数组参数意义：第一个参数为等待指定时间后开始震动，震动时间为第二个参数。后边的参数依次为等待震动和震动的时间
 //        //第二个参数为重复次数，-1为不重复，0为一直震动
@@ -78,6 +88,7 @@ public class ClockAlarmActivity extends Activity {
 //                    if (flag == 0 || flag == 2) {
                     vibrator.cancel();
 //                    }
+                    AlarmManagerUtil.cancelAlarm(ClockAlarmActivity.this, LoongggAlarmReceiver.GRAY_WAKE_ACTION, id);
                     dialog.dismiss();
                     finish();
                 }
@@ -92,8 +103,16 @@ public class ClockAlarmActivity extends Activity {
 //                    mediaPlayer.release();
 //                    }
 //                    if (flag == 0 || flag == 2) {
+                    List<Alarm> alarms = MyApp.instances.getDaoSession().getAlarmDao().queryBuilder().where(AlarmDao.Properties.Id.eq(id)).list();
+                    if (alarms != null && alarms.size() > 0) {
+                        if (!alarms.get(0).getIsLater()) {
+                            AlarmManagerUtil.setAlarmLaterInMinute(ClockAlarmActivity.this, timeInMillis, id, 1000 * 60 * 1);
+                        } else {
+                            alarms.get(0).setIsLater(true);
+                            MyApp.instances.getDaoSession().getAlarmDao().update(alarms.get(0));
+                        }
+                    }
                     vibrator.cancel();
-//                    }
                     dialog.dismiss();
                     finish();
                 }

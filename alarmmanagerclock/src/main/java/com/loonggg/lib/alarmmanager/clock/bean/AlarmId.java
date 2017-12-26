@@ -1,4 +1,4 @@
-package com.loonggg.alarmmanager.clock.bean;
+package com.loonggg.lib.alarmmanager.clock.bean;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;

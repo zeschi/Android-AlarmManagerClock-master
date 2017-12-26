@@ -25,16 +25,19 @@ public class LoongggAlarmReceiver extends BroadcastReceiver {
         // TODO Auto-generated method stub
         String msg = intent.getStringExtra("msg");
         int ring = intent.getIntExtra("ringType", 0);
-        long intervalMillis = intent.getLongExtra("intervalMillis", 0);
-        if (intervalMillis != 0) {
-            AlarmManagerUtil.setAlarmTime(context, System.currentTimeMillis() + intervalMillis,
-                    intent);
-        }
+        long timeInMillis = intent.getLongExtra("timeInMillis", 0);
+//        if (intervalMillis != 0) {
+//            AlarmManagerUtil.setAlarmTime(context, System.currentTimeMillis() + intervalMillis,
+//                    intent);
+//        }
         int flag = intent.getIntExtra("soundOrVibrator", 0);
+        int id = intent.getIntExtra("id", 0);
         Intent clockIntent = new Intent(context, ClockAlarmActivity.class);
         clockIntent.putExtra("msg", msg);
         clockIntent.putExtra("flag", flag);
         clockIntent.putExtra("ringType", ring);
+        clockIntent.putExtra("id", id);
+        clockIntent.putExtra("timeInMillis", timeInMillis);
         clockIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(clockIntent);
     }

@@ -1,12 +1,10 @@
-package com.loonggg.alarmmanager.clock;
+package com;
 
 import android.app.Application;
-import android.app.job.JobService;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.loonggg.alarmmanager.clock.service.MyJobService;
 import com.zes.greendao.gen.DaoMaster;
 import com.zes.greendao.gen.DaoSession;
 
@@ -24,8 +22,8 @@ public class MyApp extends Application {
     public void onCreate() {
         super.onCreate();
         Log.e(TAG, "MyApp onCreate");
-        MyJobService.scheduleService(this.getApplicationContext());
-        startService(new Intent(this.getApplicationContext(), MyJobService.class));
+//        MyJobService.scheduleService(this.getApplicationContext());
+//        startService(new Intent(this.getApplicationContext(), MyJobService.class));
         instances = this;
         setDatabase();
 

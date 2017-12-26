@@ -3,6 +3,7 @@ package com.loonggg.lib.alarmmanager.clock;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -95,6 +96,10 @@ public class CalculateDialog extends Dialog {
     }
 
     public int getCalculateResult() {
-        return Integer.parseInt(et_calculate_result.getText().toString());
+        String result = "0";
+        if (!TextUtils.isEmpty(et_calculate_result.getText().toString())) {
+            result = et_calculate_result.getText().toString();
+        }
+        return Integer.parseInt(result);
     }
 }
