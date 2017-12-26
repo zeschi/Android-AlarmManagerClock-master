@@ -2,7 +2,6 @@ package com.loonggg.alarmmanager.clock;
 
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
-import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
@@ -14,9 +13,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.MyApp;
 import com.bigkoo.pickerview.TimePickerView;
-import com.loonggg.alarmmanager.clock.bean.Alarm;
-import com.loonggg.alarmmanager.clock.service.DaemonService;
+import com.loonggg.lib.alarmmanager.clock.bean.Alarm;
 import com.loonggg.alarmmanager.clock.service.IMyBinder;
 import com.loonggg.alarmmanager.clock.view.SelectRemindCyclePopup;
 import com.loonggg.alarmmanager.clock.view.SelectRemindWayPopup;
@@ -24,6 +23,7 @@ import com.loonggg.lib.alarmmanager.clock.AlarmManagerUtil;
 import com.zes.greendao.gen.AlarmDao;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -102,6 +102,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             time = mAlarm.getAlarmTime();
             date_tv.setText(mAlarm.getAlarmTime());
             tv_repeat_value.setText(mAlarm.getAlarmTypeName());
+            cycle = mAlarm.getCycle();
+            ring = mAlarm.getAlarmType();
             switch (mAlarm.getAlarmType()) {
                 case 0:
                     tv_ring_value.setText("Normal to wake up");
@@ -155,8 +157,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void setClock() {
         if (time != null && time.length() > 0 || mAlarm != null) {
+            String[] times = time.split(":");
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get
+                    (Calendar.DAY_OF_MONTH), Integer.parseInt(times[0]), Integer.parseInt
+                    (times[1]), 5);
+            Alarm alarm = new Alarm();
             if (mAlarm == null) {
-                Alarm alarm = new Alarm();
                 alarm.setAlarmTime(time);
                 alarm.setAlarmType(ring);
                 alarm.setIsOpen(true);
@@ -170,6 +177,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     default:
                         alarm.setAlarmTypeName(parseRepeat(cycle, 0));
                 }
+                alarm.setCycle(cycle);
+                alarm.setTimeInMillis(AlarmManagerUtil.calMethod(0, calendar.getTimeInMillis()));
 
                 MyApp.instances.getDaoSession().getAlarmDao().insert(alarm);
             } else {
@@ -177,6 +186,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mAlarm.setAlarmTime(time);
                 mAlarm.setAlarmType(ring);
                 mAlarm.setIsOpen(true);
+                mAlarm.setCycle(cycle);
                 switch (cycle) {
                     case 0:
                         mAlarm.setAlarmTypeName("EveryDay");
@@ -187,22 +197,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     default:
                         mAlarm.setAlarmTypeName(parseRepeat(cycle, 0));
                 }
+                mAlarm.setTimeInMillis(AlarmManagerUtil.calMethod(0, calendar.getTimeInMillis()));
                 MyApp.instances.getDaoSession().getAlarmDao().update(mAlarm);
             }
-            String[] times = time.split(":");
+
             if (cycle == 0) {//是每天的闹钟
                 AlarmManagerUtil.setAlarm(this, 0, Integer.parseInt(times[0]), Integer.parseInt
                         (times[1]), getAlarmId(), 0, "Alarming", ring);
-            }
-            if (cycle == -1) {//是只响一次的闹钟
+            } else if (cycle == -1) {//是只响一次的闹钟
                 AlarmManagerUtil.setAlarm(this, 1, Integer.parseInt(times[0]), Integer.parseInt
                         (times[1]), getAlarmId(), 0, "Alarming", ring);
             } else {//多选，周几的闹钟
                 String weeksStr = parseRepeat(cycle, 1);
                 String[] weeks = weeksStr.split(",");
+                if (mAlarm != null) {
+                    for (int i = 1; i <= mAlarm.getWeekLengths(); i++) {
+                        MyApp.instances.getDaoSession().getAlarmDao().deleteByKey(mAlarm.getId() + i);
+                    }
+                    mAlarm.setWeekLengths(mAlarm.getWeekLengths() + weeks.length);
+                    mAlarm.setTimeInMillis(AlarmManagerUtil.calMethod(Integer.parseInt(weeks[0]), calendar.getTimeInMillis()));
+                    MyApp.instances.getDaoSession().getAlarmDao().update(mAlarm);
+                } else {
+                    alarm.setWeekLengths(weeks.length);
+                    alarm.setTimeInMillis(AlarmManagerUtil.calMethod(Integer.parseInt(weeks[0]), calendar.getTimeInMillis()));
+                    MyApp.instances.getDaoSession().getAlarmDao().update(alarm);
+                }
                 for (int i = 0; i < weeks.length; i++) {
                     AlarmManagerUtil.setAlarm(this, 2, Integer.parseInt(times[0]), Integer
-                            .parseInt(times[1]), getAlarmId() + i, Integer.parseInt(weeks[i]), "Alarming", ring);
+                            .parseInt(times[1]), getAlarmId(), Integer.parseInt(weeks[i]), "Alarming", ring);
+                    if (i > 0) {
+                        Alarm temp = new Alarm();
+                        temp.setTimeInMillis(calMethod(Integer.parseInt(weeks[i]), calendar.getTimeInMillis()));
+                        MyApp.instances.getDaoSession().getAlarmDao().insert(temp);
+                    }
                 }
             }
             Toast.makeText(this, "Setting Success", Toast.LENGTH_LONG).show();
@@ -387,9 +414,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int getAlarmId() {
         int id = 0;
         List<Alarm> alarmList = MyApp.instances.getDaoSession().getAlarmDao().queryBuilder().orderDesc(AlarmDao.Properties.Id).list();
-        if (alarmList != null) {
+        if (alarmList != null && alarmList.size() > 0) {
             id = alarmList.get(0).getId().intValue();
         }
         return id;
+    }
+
+    private long calMethod(int weekflag, long dateTime) {
+        long time = 0;
+        //weekflag == 0表示是按天为周期性的时间间隔或者是一次行的，weekfalg非0时表示每周几的闹钟并以周为时间间隔
+        Calendar c = Calendar.getInstance();
+        int week = c.get(Calendar.DAY_OF_WEEK);
+        if (weekflag != 0) {
+            if (1 == week) {
+                week = 7;
+            } else if (2 == week) {
+                week = 1;
+            } else if (3 == week) {
+                week = 2;
+            } else if (4 == week) {
+                week = 3;
+            } else if (5 == week) {
+                week = 4;
+            } else if (6 == week) {
+                week = 5;
+            } else if (7 == week) {
+                week = 6;
+            }
+
+            if (weekflag == week) {
+                if (dateTime > System.currentTimeMillis()) {
+                    time = dateTime;
+                } else {
+                    time = dateTime + 7 * 24 * 3600 * 1000;
+                }
+            } else if (weekflag > week) {
+                time = dateTime + (weekflag - week) * 24 * 3600 * 1000;
+            } else if (weekflag < week) {
+                time = dateTime + (weekflag - week + 7) * 24 * 3600 * 1000;
+            }
+        } else {
+            if (dateTime > System.currentTimeMillis()) {
+                time = dateTime;
+            } else {
+                time = dateTime + 24 * 3600 * 1000;
+            }
+        }
+        return time;
     }
 }

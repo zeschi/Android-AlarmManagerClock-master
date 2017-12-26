@@ -6,9 +6,9 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
-import com.loonggg.alarmmanager.clock.MyApp;
+import com.MyApp;
 import com.loonggg.alarmmanager.clock.R;
-import com.loonggg.alarmmanager.clock.bean.Alarm;
+import com.loonggg.lib.alarmmanager.clock.bean.Alarm;
 import com.loonggg.alarmmanager.clock.view.CustomDialog;
 import com.loonggg.lib.alarmmanager.clock.AlarmManagerUtil;
 import com.zes.greendao.gen.AlarmDao;
@@ -103,8 +103,13 @@ public class AlarmAdapter extends CommonRecycleAdapter<Alarm> {
             @Override
             public void subscribe(ObservableEmitter<Boolean> emitter) throws Exception {
                 try {
-                    AlarmManagerUtil.cancelAlarm(mContext, AlarmManagerUtil.ALARM_ACTION, getAlarmId());
-                    MyApp.instances.getDaoSession().getAlarmDao().delete(data);
+                    for (int i = 0; i <= data.getWeekLengths(); i++) {
+                        if (i == data.getWeekLengths() && i != 0) {
+                            break;
+                        }
+                        AlarmManagerUtil.cancelAlarm(mContext, AlarmManagerUtil.ALARM_ACTION, data.getId().intValue() + i);
+                        MyApp.instances.getDaoSession().getAlarmDao().deleteByKey(data.getId() + i);
+                    }
                     emitter.onNext(true);
                 } catch (Exception e) {
                     emitter.onNext(false);
@@ -172,7 +177,25 @@ public class AlarmAdapter extends CommonRecycleAdapter<Alarm> {
     private void updateAlarm(Alarm data, int position) {
         MyApp.instances.getDaoSession().getAlarmDao().update(data);
         if (!data.getIsOpen()) {
-            AlarmManagerUtil.cancelAlarm(mContext, "", getAlarmId());
+            for (int i = 0; i <= data.getWeekLengths(); i++) {
+                if (i == data.getWeekLengths() && i != 0) {
+                    break;
+                }
+                AlarmManagerUtil.cancelAlarm(mContext, AlarmManagerUtil.ALARM_ACTION, data.getId().intValue() + i);
+            }
+        } else {
+            List<Alarm> alarms = MyApp.instances.getDaoSession().getAlarmDao().queryBuilder().where(AlarmDao.Properties.Id.between(data.getId(), data.getId() + data.getWeekLengths())).list();
+            if (alarms != null && alarms.size() > 0) {
+                String[] times = alarms.get(0).getAlarmTime().split(":");
+                int flag = 0;
+                if (alarms.size() > 1) {
+                    flag = 2;
+                }
+                for (int i = 0; i < alarms.size(); i++) {
+                    AlarmManagerUtil.setAlarm(mContext, flag, Integer.parseInt(times[0]), Integer.parseInt
+                            (times[1]), alarms.get(i).getId().intValue(), data.getWeekLengths() + i, "", alarms.get(i).getAlarmType());
+                }
+            }
         }
 //        notifyDataSetChanged();
     }

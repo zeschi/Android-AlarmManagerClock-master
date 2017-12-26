@@ -89,7 +89,7 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="5dp"
             android:layout_toLeftOf="@id/arrow_two"
-            android:text="Easy to wake up"
+            android:text="Normal to wake up"
             android:textColor="@color/black_33"
             android:textSize="14sp" />
     </RelativeLayout>

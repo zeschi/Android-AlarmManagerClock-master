@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'org.greenrobot.greendao'
 
 android {
     compileSdkVersion 23
@@ -18,11 +17,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    greendao {
-        schemaVersion 1
-        daoPackage 'com.zes.greendao.gen'
-        targetGenDir 'src/main/java'
-    }
+
 }
 
 dependencies {
@@ -33,8 +28,6 @@ dependencies {
     compile project(':alarmmanagerclock')
     compile 'com.coolerfall:android-app-daemon:1.2.0'
     compile 'com.android.support:recyclerview-v7:23.0.1'
-    compile'org.greenrobot:greendao:3.0.1'
-    compile'org.greenrobot:greendao-generator:3.0.0'
     compile 'io.reactivex.rxjava2:rxjava:2.0.1'
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
  }

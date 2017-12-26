@@ -7,12 +7,14 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.View;
 
+import com.MyApp;
 import com.loonggg.alarmmanager.clock.adapter.AlarmAdapter;
 import com.loonggg.alarmmanager.clock.adapter.CommonRecycleAdapter;
 import com.loonggg.alarmmanager.clock.adapter.RecycleViewHolder;
-import com.loonggg.alarmmanager.clock.bean.Alarm;
+import com.loonggg.lib.alarmmanager.clock.bean.Alarm;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -116,7 +118,15 @@ public class AlarmActivity extends AppCompatActivity implements CommonRecycleAda
             @Override
             public void subscribe(ObservableEmitter<List<Alarm>> emitter) throws Exception {
                 List<Alarm> alarmList = MyApp.instances.getDaoSession().getAlarmDao().queryBuilder().build().list();
-                emitter.onNext(alarmList);
+                List<Alarm> temp = new ArrayList<>();
+                if (alarmList != null && alarmList.size() > 0) {
+                    for (Alarm alarm : alarmList) {
+                        if (!TextUtils.isEmpty(alarm.getAlarmTime())) {
+                            temp.add(alarm);
+                        }
+                    }
+                }
+                emitter.onNext(temp);
             }
         });
         //建立连接
