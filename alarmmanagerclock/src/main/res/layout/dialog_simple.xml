@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:clickable="false"
-              android:gravity="center"
-              android:orientation="vertical">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="false"
+    android:gravity="center"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,7 +20,7 @@
             android:layout_height="50dp"
             android:layout_gravity="center_vertical|center_horizontal"
             android:layout_margin="12dp"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/dialog_title"
@@ -29,9 +29,9 @@
             android:layout_margin="10dp"
             android:gravity="center_vertical|center_horizontal"
             android:textColor="@color/light_black"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
 
-        <View style="@style/horizontal_line_style"/>
+        <View style="@style/horizontal_line_style" />
 
         <EditText
             android:id="@+id/dialog_message"
@@ -41,10 +41,11 @@
             android:background="@null"
             android:editable="false"
             android:gravity="center_vertical"
-            android:hint="10000"
+            android:hint="Alarming!!!"
+
             android:padding="10dp"
             android:textColor="@color/light_black"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
 
         <LinearLayout
             android:id="@+id/ll_button"
@@ -52,7 +53,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <View style="@style/horizontal_line_style"/>
+            <View style="@style/horizontal_line_style" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -66,9 +67,19 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="@null"
-                    android:text="确定"
+                    android:text="Confirm"
                     android:textColor="@color/light_black"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
+
+                <Button
+                    android:id="@+id/dialog_later"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:text="LATER 5 MIN"
+                    android:textColor="@color/light_black"
+                    android:textSize="16sp" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

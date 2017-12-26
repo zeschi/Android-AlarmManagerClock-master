@@ -3,6 +3,8 @@ package com.loonggg.lib.alarmmanager.clock;
 import android.app.Activity;
 import android.app.Service;
 import android.media.MediaPlayer;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.view.View;
@@ -29,9 +31,11 @@ public class ClockAlarmActivity extends Activity {
 
     private void showDialogInBroadcastReceiver() {
 //        if (flag == 1 || flag == 2) {
-//        mediaPlayer = MediaPlayer.create(this, R.raw.beep);
-//        mediaPlayer.setLooping(true);
-//        mediaPlayer.start();
+        //
+
+        mediaPlayer = MediaPlayer.create(this, R.raw.in_call_alarm);
+        mediaPlayer.setLooping(true);
+        mediaPlayer.start();
 ////        }
 //        //数组参数意义：第一个参数为等待指定时间后开始震动，震动时间为第二个参数。后边的参数依次为等待震动和震动的时间
 //        //第二个参数为重复次数，-1为不重复，0为一直震动
@@ -61,10 +65,12 @@ public class ClockAlarmActivity extends Activity {
         final SimpleDialog dialog = new SimpleDialog(this, R.style.Theme_dialog);
         dialog.show();
         dialog.setTitle(message);
+        dialog.setMessage("Alarming!!!");
+        dialog.setLaterVisible();
         dialog.setClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (dialog.bt_confirm == v || dialog.bt_cancel == v) {
+                if (dialog.bt_confirm == v) {
 //                    if (flag == 1 || flag == 2) {
 //                    mediaPlayer.stop();
 //                    mediaPlayer.release();
@@ -77,6 +83,23 @@ public class ClockAlarmActivity extends Activity {
                 }
             }
         });
+        dialog.setLaterClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (dialog.bt_later == v) {
+//                    if (flag == 1 || flag == 2) {
+//                    mediaPlayer.stop();
+//                    mediaPlayer.release();
+//                    }
+//                    if (flag == 0 || flag == 2) {
+                    vibrator.cancel();
+//                    }
+                    dialog.dismiss();
+                    finish();
+                }
+            }
+        });
+
     }
 
     /**
@@ -86,10 +109,11 @@ public class ClockAlarmActivity extends Activity {
         final SimpleDialog dialog = new SimpleDialog(this, R.style.Theme_dialog);
         dialog.show();
         dialog.setTitle(message);
+        dialog.setMessage("Alarming!!!");
         dialog.setClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (dialog.bt_confirm == v || dialog.bt_cancel == v) {
+                if (dialog.bt_confirm == v) {
 //                    if (flag == 1 || flag == 2) {
 //                    mediaPlayer.stop();
 //                    mediaPlayer.release();

@@ -20,7 +20,7 @@ public class SimpleDialog extends Dialog {
     public static int TYPE_NO_BT = 0;
     public TextView dialog_title;
     public EditText dialog_message;
-    public Button bt_cancel, bt_confirm;
+    public Button bt_later, bt_confirm;
     private LinearLayout ll_button;
     protected Context mContext;
     private View.OnClickListener listener;
@@ -42,6 +42,8 @@ public class SimpleDialog extends Dialog {
         dialog_message = (EditText) customView.findViewById(R.id.dialog_message);
         dialog_message.clearFocus();
         bt_confirm = (Button) customView.findViewById(R.id.dialog_confirm);
+        bt_later = (Button) customView.findViewById(R.id.dialog_later);
+        bt_later.setVisibility(View.GONE);
     }
 
     @Override
@@ -66,6 +68,12 @@ public class SimpleDialog extends Dialog {
         return this;
     }
 
+    public SimpleDialog setLaterClickListener(View.OnClickListener listener) {
+        this.listener = listener;
+        bt_later.setOnClickListener(listener);
+        return this;
+    }
+
     public SimpleDialog setMessage(String message) {
         dialog_message.setText(message);
         return this;
@@ -80,8 +88,11 @@ public class SimpleDialog extends Dialog {
         dialog_title.setVisibility(View.GONE);
         icon.setVisibility(View.VISIBLE);
         icon.setBackgroundResource(iconResId);
-
         return this;
+    }
+
+    public void setLaterVisible() {
+        bt_later.setVisibility(View.VISIBLE);
     }
 
 }
