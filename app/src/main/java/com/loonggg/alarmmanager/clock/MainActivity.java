@@ -222,9 +222,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     alarm.setTimeInMillis(AlarmManagerUtil.calMethod(Integer.parseInt(weeks[0]), calendar.getTimeInMillis()));
                     MyApp.instances.getDaoSession().getAlarmDao().update(alarm);
                 }
-                for (int i = 0; i < weeks.length; i++) {
+                AlarmManagerUtil.setAlarm(this, 2, Integer.parseInt(times[0]), Integer
+                        .parseInt(times[1]), getAlarmId(), 0, "Alarming", ring);
+                for (int i = 1; i < weeks.length; i++) {
                     AlarmManagerUtil.setAlarm(this, 2, Integer.parseInt(times[0]), Integer
-                            .parseInt(times[1]), getAlarmId(), Integer.parseInt(weeks[i]), "Alarming", ring);
+                            .parseInt(times[1]), getAlarmId() + 1, Integer.parseInt(weeks[i]), "Alarming", ring);
                     if (i > 0) {
                         Alarm temp = new Alarm();
                         temp.setTimeInMillis(calMethod(Integer.parseInt(weeks[i]), calendar.getTimeInMillis()));
