@@ -1,16 +1,19 @@
 package com.loonggg.alarmmanager.clock;
 
+import android.app.TimePickerDialog;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.MyApp;
@@ -29,10 +32,11 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private TextView date_tv;
-    private TimePickerView pvTime;
+    //    private TimePickerView pvTime;
+    private TimePickerDialog timePickerDialog;
     private RelativeLayout repeat_rl, ring_rl;
     private TextView tv_repeat_value, tv_ring_value;
-    private LinearLayout allLayout;
+    private RelativeLayout allLayout;
     private Button set_btn, cancel_btn;
 
     private String time;
@@ -44,13 +48,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Alarm mAlarm;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mAlarm = (Alarm) getIntent().getSerializableExtra("Alarm");
 
-        allLayout = (LinearLayout) findViewById(R.id.all_layout);
+        allLayout = (RelativeLayout) findViewById(R.id.all_layout);
         set_btn = (Button) findViewById(R.id.set_btn);
         set_btn.setOnClickListener(this);
         cancel_btn = (Button) findViewById(R.id.cancel_btn);
@@ -63,41 +68,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ring_rl.setOnClickListener(this);
         tv_repeat_value = (TextView) findViewById(R.id.tv_repeat_value);
         tv_ring_value = (TextView) findViewById(R.id.tv_ring_value);
-        pvTime = new TimePickerView(this, TimePickerView.Type.HOURS_MINS);
-        pvTime.setTime(new Date());
-        pvTime.setCyclic(false);
-        pvTime.setCancelable(true);
-        //时间选择后回调
-        pvTime.setOnTimeSelectListener(new TimePickerView.OnTimeSelectListener() {
-
-            @Override
-            public void onTimeSelect(Date date) {
-                time = getTime(date);
-                date_tv.setText(time);
-            }
-        });
-
-        date_tv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                pvTime.show();
-//          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//            mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-//            JobInfo.Builder builder = new JobInfo.Builder(12345,
-//                    new ComponentName(getPackageName(), JobSchedulerService.class.getName()));
-//                builder.setPeriodic(3000); //每隔60秒运行一次
-//                builder.setRequiresCharging(true);
-//                builder.setPersisted(true);  //设置设备重启后，是否重新执行任务
-//                builder.setRequiresDeviceIdle(true);
-//              mJobScheduler.schedule(builder.build());          }
+//        pvTime = new TimePickerView(this, TimePickerView.Type.HOURS_MINS);
+//        pvTime.setTime(new Date());
+//        pvTime.setCyclic(false);
+//        pvTime.setCancelable(true);
+//        //时间选择后回调
+//        pvTime.setOnTimeSelectListener(new TimePickerView.OnTimeSelectListener() {
 //
-//
-            }
-        });
-//        myConn = new MyConn();
-//        Intent daemonIntent = new Intent(this, DaemonService.class);
-////        bindService(daemonIntent, myConn, BIND_AUTO_CREATE);
-//        startService(daemonIntent);
+//            @Override
+//            public void onTimeSelect(Date date) {
+//                time = getTime(date);
+//                date_tv.setText(time);
+//            }
+//        });
+
+
+//        timePickerDialog.setTitle("pick");
+//        timePickerDialog.show();
+        final int hour;
+        final int miniute;
         if (mAlarm != null) {
             time = mAlarm.getAlarmTime();
             date_tv.setText(mAlarm.getAlarmTime());
@@ -116,6 +105,55 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     break;
             }
         }
+        Calendar c = Calendar.getInstance();
+        if (!TextUtils.isEmpty(time)) {
+            String[] times = time.split(":");
+            hour = Integer.parseInt(times[0]);
+            miniute = Integer.parseInt(times[1]);
+        } else {
+            hour = c.get(Calendar.HOUR_OF_DAY);
+            miniute = c.get(Calendar.MINUTE);
+        }
+        timePickerDialog = new TimePickerDialog(MainActivity.this, android.R.style.Theme_DeviceDefault_Light_Dialog, new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker view, int hourOfDay, int minuteOfDay) {
+                if (hourOfDay < 10) {
+                    time = "0" + hourOfDay;
+                } else {
+                    time = hourOfDay + "";
+                }
+                if (minuteOfDay < 10) {
+                    time = time + ":0" + minuteOfDay;
+                } else {
+                    time = time + ":" + minuteOfDay;
+                }
+
+                date_tv.setText(time);
+            }
+        }, hour, miniute, true);
+        date_tv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                timePickerDialog.show();
+//          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+//            JobInfo.Builder builder = new JobInfo.Builder(12345,
+//                    new ComponentName(getPackageName(), JobSchedulerService.class.getName()));
+//                builder.setPeriodic(3000); //每隔60秒运行一次
+//                builder.setRequiresCharging(true);
+//                builder.setPersisted(true);  //设置设备重启后，是否重新执行任务
+//                builder.setRequiresDeviceIdle(true);
+//              mJobScheduler.schedule(builder.build());          }
+//
+//
+            }
+        });
+//        myConn = new MyConn();
+//        Intent daemonIntent = new Intent(this, DaemonService.class);
+////        bindService(daemonIntent, myConn, BIND_AUTO_CREATE);
+//        startService(daemonIntent);
+
     }
 
     public static String getTime(Date date) {

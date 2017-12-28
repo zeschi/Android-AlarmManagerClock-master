@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AlarmManagerClock</string>
+    <string name="app_name">Keep Clock</string>
     <string name="mon">Monday</string>
     <string name="tue">Tuesday</string>
     <string name="wed">Wednesday</string>
